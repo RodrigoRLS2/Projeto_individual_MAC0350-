@@ -1,103 +1,32 @@
-# Projeto_individual_MAC0350-
+Funcionalidades Principais:
+- Criacao de Partidas: Geracao automatica do banco de dados, embaralhamento das 28 pecas e distribuicao inicial.
+- Lobby e Busca em Tempo Real: Filtro de mesas por ID utilizando requisicoes GET via HTMX enquanto o usuario digita.
+- Multiplayer Assincrono: Sincronizacao da mesa e das maos dos jogadores atraves de short polling (a cada 2 segundos) acionado por HTMX
+- CRUD Completo: Implementacao das operacoes fundamentais (Create, Read, Update, Delete) com exclusao em cascata (Partidas -> Jogadores -> Pecas).
 
-Desenvolvimento de um aplicativo web multiplayer de dominó onde dois jogadores podem participar da mesma partida online.
+Como Executar o Projeto
 
-O sistema permitirá que cada jogador veja apenas suas próprias peças enquanto ambos visualizam o tabuleiro compartilhado. O foco do projeto não é validar todas as regras do dominó, mas sim demonstrar a integração entre backend, banco de dados e interface dinâmica utilizando HTMX.
+1. Pre-requisitos:
+Certifique-se de ter o Python 3.8 ou superior instalado em sua maquina.
 
-O tabuleiro será atualizado dinamicamente conforme as jogadas forem realizadas.
+2. Instalar Dependencias:
+Instale os pacotes necessarios executando:
+pip install fastapi[standard] sqlmodel jinja2
 
-Prototipo inicial (Criado com ajuda de LLM, arquitetura não definida ainda):
+3. Iniciar o Servidor:
+ python -m uvicorn main:app --reload ou  py -m fastapi dev main.py
 
-* Criar uma nova partida
-* Entrar em uma partida existente
-* Gerar automaticamente as **28 peças de dominó**
-* Distribuir **7 peças para cada jogador**
-* Permitir que jogadores coloquem peças no tabuleiro
-* Atualizar o tabuleiro automaticamente usando **HTMX**
-* Botão para **desfazer a última jogada**
-* Botão para **declarar vencedor**
+(Para testar o multiplayer localmente, abra uma janela normal e uma janela anonima, ou dois navegadores diferentes simultaneamente).
 
-### Tela Inicial
+Estrutura do Projeto
 
-Permite que o usuário:
+- main.py: Nucleo do back-end, contendo a configuracao do FastAPI, os modelos do SQLModel e todos os endpoints e rotas de logica do jogo.
+- templates/: Diretorio contendo as visualizacoes do Jinja2.
+  - index.html: Tela inicial e menu principal.
+  - lobby.html: Tela de busca e listagem de partidas abertas.
+  - match.html: Interface principal do jogo (tabuleiro e pecas do jogador).
+  - play_update.html: Fragmento de HTML usado pelo HTMX para atualizar a mesa.
+  - game_over.html: Tela de encerramento e declaracao do vencedor.
+- domino.db: Arquivo gerado automaticamente pelo banco de dados SQLite.
 
-* Crie uma nova partida
-* Entre em uma partida existente informando seu nome
-
-### Tela da Partida
-
-Nesta tela o jogador poderá:
-
-* Visualizar o tabuleiro
-* Ver suas próprias peças
-* Jogar peças
-* Desfazer a última jogada
-* Declarar o vencedor
-
-A interface será **responsiva**, permitindo o uso tanto em computadores quanto em dispositivos móveis.
-
----
-
-## Modelos do Banco de Dados
-
-O sistema utilizará três modelos principais no banco de dados.
-
-### Match
-
-Representa uma partida de dominó.
-
-Campos:
-
-* `id`
-* `status`
-* `winner_player_id`
-
-### Player
-
-Representa um jogador dentro de uma partida.
-
-Campos:
-
-* `id`
-* `name`
-* `match_id`
-
-### Tile
-
-Representa uma peça de dominó.
-
-Campos:
-
-* `id`
-* `left_value`
-* `right_value`
-* `player_id`
-* `match_id`
-* `played`
-
----
-
-## Operações CRUD com HTMX
-
-O projeto utilizará **HTMX** para realizar operações CRUD diretamente na interface.
-
-Serão utilizados os seguintes métodos:
-
-* `hx-get` – carregar dados dinamicamente
-* `hx-post` – criar registros
-* `hx-put` – atualizar registros
-* `hx-delete` – remover registros
-
-Essas operações permitirão atualizar partes da página sem necessidade de recarregamento completo.
-
----
-
-## Objetivo Acadêmico
-
-O principal objetivo do projeto é demonstrar o uso integrado de:
-
-* FastAPI como backend
-* SQLAlchemy para persistência de dados
-* HTMX para interação dinâmica no frontend
-
-O projeto busca implementar um exemplo simples de aplicação web interativa utilizando tecnologias modernas de desenvolvimento web.
+Nota: A redacao e formatacao base deste arquivo foram geradas com o auxilio de Inteligencia Artificial.
