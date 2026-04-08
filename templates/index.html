@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dominó Multiplayer</title>
+    
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        /* RESET BÁSICO */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P', cursive;
+            background: linear-gradient(45deg, #8B0000, #00008B);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+            color: white;
+            overflow: hidden; /* Evita barra de rolagem indesejada */
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* LOGO RESPONSIVO */
+        .logo {
+            /* clamp(minimo, ideal, maximo) - cresce e diminui suavemente */
+            font-size: clamp(2.5rem, 8vw, 6rem); 
+            text-shadow: 4px 4px 0px #000;
+            margin-bottom: 40px;
+            text-align: center;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* CONTAINER DO MENU */
+        .menu-container {
+            display: flex;
+            flex-direction: row; /* Lado a lado por padrão (PC) */
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            background: rgba(40, 45, 50, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 0px rgba(0,0,0,0.5);
+            width: auto;
+            max-width: 95vw; /* Impede que passe da tela em monitores menores */
+        }
+
+        /* INPUT DO JOGADOR */
+        .player-input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background-color: #4A5560;
+            padding: 15px 20px;
+            border-radius: 8px;
+            height: 100%;
+            justify-content: center;
+        }
+
+        .player-input-container label {
+            font-size: 0.7rem;
+            color: #ccc;
+            text-transform: uppercase;
+        }
+
+        .player-input {
+            font-family: 'Press Start 2P', cursive;
+            padding: 12px;
+            border-radius: 4px;
+            border: none;
+            background: #2a3036;
+            color: white;
+            width: 100%;
+            min-width: 150px;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .player-input:focus {
+            box-shadow: 0 0 0 2px #fff;
+        }
+
+        /* BOTÕES ARCADE */
+        .btn {
+            font-family: 'Press Start 2P', cursive;
+            border: none;
+            padding: 20px 30px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            text-transform: uppercase;
+            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.2), 0 4px 0 #1a1a1a;
+            transition: transform 0.1s, box-shadow 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2), 0 0 0 #1a1a1a;
+        }
+
+        .btn-play { background-color: #0088FF; }
+        .btn-collection { background-color: #2E8B57; }
+
+        /* REGRAS DE RESPONSIVIDADE (MOBILE) */
+        @media (max-width: 768px) {
+            .menu-container {
+                flex-direction: column; /* Empilha tudo verticalmente */
+                width: 90%;
+                padding: 20px;
+                gap: 15px;
+            }
+
+            .player-input-container, .btn {
+                width: 100%; /* Ocupa toda a largura do menu no celular */
+            }
+
+            .btn {
+                padding: 15px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo">DOMINÓ</div>
+
+    <main id="main-content" class="menu-container">
+        
+        <div class="player-input-container">
+            <label for="playerName">Jogador</label>
+            <input type="text" id="playerName" name="playerName" class="player-input" placeholder="Seu Nome">
+        </div>
+
+        <button class="btn btn-play" 
+                hx-post="/match/create" 
+                hx-include="#playerName" 
+                hx-target="#main-content" 
+                hx-swap="innerHTML">
+            Criar Partida
+        </button>
+
+        <button class="btn btn-collection" 
+                hx-get="/matches" 
+                hx-target="#main-content" 
+                hx-swap="innerHTML">
+            Buscar Partida
+        </button>
+
+    </main>
+
+</body>
+</html>

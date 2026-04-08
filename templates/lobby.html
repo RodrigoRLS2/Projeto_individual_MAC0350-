@@ -1,0 +1,77 @@
+<style>
+    .lobby-container {
+        width: 100%; 
+        max-width: 600px; 
+        margin: 0 auto; 
+        background: rgba(30,30,30,0.9); 
+        border-radius: 15px; 
+        border: 4px solid #555; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        display: flex;
+        flex-direction: column;
+        max-height: 85vh; /* O Segredo: Nunca será maior que 85% da tela! */
+    }
+    .lobby-header {
+        text-align: center; color: #e6a817; margin: 15px 0; font-family: 'Press Start 2P', cursive; font-size: 1rem;
+    }
+    .lobby-content {
+        padding: 0 20px 20px 20px;
+        overflow-y: auto; /* Se a lista for grande, rola SÓ aqui dentro */
+        flex-grow: 1;
+    }
+    /* Estiliza a barra de rolagem do Lobby */
+    .lobby-content::-webkit-scrollbar { width: 6px; }
+    .lobby-content::-webkit-scrollbar-track { background: #111; border-radius: 4px; }
+    .lobby-content::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+</style>
+
+<div class="lobby-container">
+    <h2 class="lobby-header">LOBBY</h2>
+    
+    <div class="lobby-content">
+        <div class="player-input-container" style="margin-bottom: 15px; background: #111; padding: 10px; border-radius: 8px;">
+            <label for="joinPlayerName" style="color: #ccc; font-size: 0.7rem; display: block; margin-bottom: 5px;">Seu Nome para Entrar:</label>
+            <input type="text" id="joinPlayerName" name="playerName" class="player-input" placeholder="Ex: Zé da Silva" style="width: 100%; padding: 8px; font-size: 0.8rem;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <input type="text" id="searchMesa" name="search_id" placeholder="Buscar Mesa por ID..." 
+                   value="{{ search_id }}"
+                   hx-get="/matches" 
+                   hx-trigger="keyup changed delay:300ms" 
+                   hx-target="#main-content" 
+                   style="width: 100%; padding: 10px; border-radius: 8px; background: #222; color: white; border: 1px solid #333; font-family: sans-serif; font-size: 0.8rem; outline: none;">
+        </div>
+
+        <div style="background: #0a0a0a; padding: 10px; border-radius: 8px; border: 1px solid #333;">
+            {% for m in matches %}
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 10px; margin-bottom: 8px; border-radius: 5px; border-left: 4px solid #0088FF;">
+                    <span style="color: white; font-size: 0.7rem; font-family: sans-serif; font-weight: bold; text-transform: uppercase;">
+                        Mesa #{{ m.id }} <br><span style="color:#aaa; font-size:0.6rem; font-weight: normal;">Esperando...</span>
+                    </span>
+                    
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn" style="background: #2E8B57; padding: 8px 12px; font-size: 0.6rem;" 
+                                hx-post="/match/join/{{ m.id }}" 
+                                hx-include="#joinPlayerName" 
+                                hx-target="#main-content" 
+                                hx-swap="innerHTML">
+                            ENTRAR
+                        </button>
+                    
+                        <button class="btn" style="background: #8B1014; padding: 8px 12px; font-size: 0.6rem;" 
+                                hx-delete="/match/delete/{{ m.id }}" 
+                                hx-target="#main-content" 
+                                hx-swap="innerHTML">
+                            X
+                        </button>
+                    </div>
+                </div>
+            {% else %}
+                <p style="text-align: center; color: #666; font-size: 0.7rem; font-family: sans-serif; padding: 15px;">Nenhuma mesa aguardando jogadores no momento.</p>
+            {% endfor %}
+        </div>
+        
+        <button class="btn" style="width: 100%; margin-top: 15px; background: #8B1014; font-size: 0.7rem;" onClick="window.location.reload()">VOLTAR AO MENU</button>
+    </div>
+</div>

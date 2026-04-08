@@ -1,0 +1,130 @@
+<style>
+    :root { --t-min: 45px; --t-max: 90px; --t-font: 1.5rem; }
+
+    #main-content {
+        background: radial-gradient(circle, #8B1014 0%, #3a0002 100%) !important; 
+        border: 12px solid #a8a8a8 !important; border-radius: 40px !important;
+        width: 95vw !important; max-width: 1200px !important; height: 90vh !important;
+        flex-direction: column !important; justify-content: flex-start !important;
+        padding: 20px !important; box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.9), 0 20px 40px rgba(0,0,0,0.8) !important;
+        position: relative; overflow-y: auto !important; overflow-x: hidden !important; 
+    }
+
+    @media (max-width: 768px) {
+        :root { --t-min: 30px; --t-max: 60px; --t-font: 1rem; }
+        #main-content {
+            border-width: 5px !important; border-radius: 20px !important; padding: 10px !important;
+            height: 85vh !important; height: 85dvh !important; -webkit-overflow-scrolling: touch;
+        }
+        .match-header { margin-bottom: 10px !important; }
+        .board { padding: 10px !important; min-height: 100px !important; margin-bottom: 10px !important; }
+        .player-hand-container { padding: 10px !important; margin-bottom: 5px !important; }
+        #player-hand { gap: 8px !important; padding-top: 25px !important; }
+        .domino-wrapper.active .arrows-container { top: -35px; }
+        .arrow-btn { width: 28px; height: 28px; font-size: 1rem; }
+        .btn { padding: 8px 10px !important; font-size: 0.6rem !important; }
+        .marca-dagua { font-size: 4rem !important; opacity: 0.02 !important; }
+    }
+
+    .arrows-container { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; opacity: 0; pointer-events: none; transition: opacity 0.2s, top 0.2s; z-index: 10; }
+    .domino-wrapper.active .arrows-container { opacity: 1; top: -45px; pointer-events: all; }
+    .domino-wrapper.active .domino-tile { transform: translateY(-15px); border-color: #e6a817; box-shadow: 0 15px 25px rgba(0,0,0,0.8); }
+    .arrow-btn { background: #8B1014; color: white; border: 2px solid #ccc; border-radius: 50%; width: 35px; height: 35px; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; transition: transform 0.1s, background 0.1s; }
+    .arrow-btn:hover { background: #e6a817; transform: scale(1.1); }
+    .marca-dagua { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); font-family: 'Arial Black', sans-serif; font-size: clamp(5rem, 15vw, 15rem); color: rgba(255, 255, 255, 0.03); pointer-events: none; letter-spacing: -5px; z-index: 0; }
+    .match-header { z-index: 1; display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px; }
+    .board { z-index: 1; flex-grow: 1; width: 100%; background: rgba(0, 0, 0, 0.3); border-radius: 20px; border: 2px dashed rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: flex-start; margin-bottom: 20px; overflow-x: auto; overflow-y: hidden; padding: 20px; scroll-behavior: smooth; }
+    .board::-webkit-scrollbar { height: 8px; }
+    .board::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 10px; margin: 0 20px; }
+    .board::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 10px; }
+    .board::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
+    .player-hand-container { z-index: 1; width: 100%; background: rgba(0, 0, 0, 0.4); padding: 15px; border-radius: 20px; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    .domino-tile { background-color: #fdf6e3; color: #111; border-radius: 8px; width: var(--t-min); height: var(--t-max); display: flex; flex-direction: column; box-shadow: 3px 3px 8px rgba(0,0,0,0.6), inset -2px -2px 4px rgba(0,0,0,0.1), inset 2px 2px 4px rgba(255,255,255,0.8); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; font-family: 'Arial', sans-serif; font-weight: bold; border: 1px solid #ccc; }
+    .domino-tile:hover { transform: translateY(-15px) scale(1.1); box-shadow: 5px 15px 20px rgba(0,0,0,0.7); border-color: #8B1014; }
+    .domino-half { flex: 1; display: flex; align-items: center; justify-content: center; font-size: var(--t-font); }
+    .domino-divider { height: 2px; background-color: #222; width: 70%; margin: 0 auto; box-shadow: 0 1px 1px rgba(255,255,255,0.5); }
+</style>
+
+<div class="marca-dagua">BRAHMA</div>
+
+<div class="match-header">
+    <div>
+        <div style="background: rgba(0,0,0,0.5); color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; display: inline-block; margin-bottom: 5px; font-family: 'Press Start 2P', cursive; border: 1px solid #555;">MESA #{{ match.id }}</div>
+        <div style="font-size: 0.8rem; color: #ddd; margin-top: 5px; font-family: sans-serif; font-weight: bold;">JOGADOR: {{ player.name | upper }}</div>
+    </div>
+    <button class="btn" style="background-color: #111; border: 1px solid #333; padding: 10px 15px; font-size: 0.7rem; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.5);" onClick="window.location.reload()">SAIR DA MESA</button>
+</div>
+
+<div id="turn-indicator" style="width: 100%; text-align: center; margin-bottom: 15px;">
+    <span style="padding: 8px 20px; border-radius: 20px; font-size: 0.8rem; font-family: 'Press Start 2P', cursive; 
+          background: {% if is_my_turn %} #2E8B57 {% else %} #444 {% endif %}; 
+          color: {% if is_my_turn %} white {% else %} #888 {% endif %}; border: 2px solid rgba(255,255,255,0.1);">
+        {% if is_my_turn %} SUA VEZ {% else %} VEZ DE: {{ turn_name | upper }} {% endif %}
+    </span>
+</div>
+
+<div class="board" id="game-board">
+    <p style="color: rgba(255, 255, 255, 0.4); font-size: 0.9rem; font-family: sans-serif; text-transform: uppercase; letter-spacing: 2px;">A mesa está limpa</p>
+</div>
+
+<div class="player-hand-container">
+    <h3 style="font-size: 0.7rem; margin-bottom: 10px; text-align: center; color: #bbb; text-transform: uppercase; letter-spacing: 1px;">Suas Peças</h3>
+    
+    <div id="player-hand-wrapper" 
+         hx-get="/match/status/{{ match.id }}/{{ player.id }}" 
+         hx-trigger="{% if not is_my_turn %}every 2s{% else %}none{% endif %}"
+         hx-target="#player-hand" 
+         hx-swap="outerHTML">
+         
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; padding-top: 30px;" id="player-hand">
+            {% for tile in hand %}
+            <div class="domino-wrapper" style="position: relative; display: inline-block;">
+                {% if is_my_turn %}
+                <div class="arrows-container">
+                    <button class="arrow-btn" onclick="playPiece({{tile.id}}, 'left', event)">←</button>
+                    <button class="arrow-btn" onclick="playPiece({{tile.id}}, 'right', event)">→</button>
+                </div>
+                {% endif %}
+
+                <div class="domino-tile {% if not is_my_turn %}disabled{% endif %}" 
+                     style="{% if not is_my_turn %} opacity: 0.6; cursor: not-allowed; {% endif %}"
+                     {% if is_my_turn %} onclick="toggleArrows(this)" {% endif %}
+                     id="tile-{{ tile.id }}">
+                    <div class="domino-half">{{ tile.left_value }}</div>
+                    <div class="domino-divider"></div>
+                    <div class="domino-half">{{ tile.right_value }}</div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div style="width: 100%; display: flex; justify-content: center; margin-top: 15px; gap: 15px;">
+                <button class="btn" style="background: #2E8B57; padding: 10px; font-size: 0.7rem; {% if not is_my_turn %} opacity: 0.5; cursor: not-allowed; {% endif %}" {% if is_my_turn %} hx-post="/match/draw/{{ player.id }}" hx-target="#player-hand" hx-swap="outerHTML" {% endif %}>COMPRAR PEÇA</button>
+                <button class="btn" style="background: #e6a817; padding: 10px; font-size: 0.7rem; {% if not is_my_turn %} opacity: 0.5; cursor: not-allowed; {% endif %}" {% if is_my_turn %} hx-post="/match/pass/{{ player.id }}" hx-target="#player-hand" hx-swap="outerHTML" {% endif %}>PULAR VEZ</button>
+            </div>
+
+            <script>
+                function toggleArrows(tileElement) {
+                    let wrapper = tileElement.parentElement;
+                    document.querySelectorAll('.domino-wrapper.active').forEach(el => {
+                        if(el !== wrapper) el.classList.remove('active');
+                    });
+                    wrapper.classList.toggle('active');
+                }
+
+                function playPiece(tileId, side, event) {
+                    event.stopPropagation();
+                    htmx.ajax('PUT', `/match/play/${tileId}?side=${side}`, {target: '#player-hand', swap: 'outerHTML'});
+                }
+
+                if (!window.errorListenerAdded) {
+                    document.body.addEventListener('showError', function(evt) {
+                        Swal.fire({
+                            icon: 'error', title: 'Aviso', text: evt.detail.value, background: '#222', color: '#fff', confirmButtonColor: '#8B1014'
+                        });
+                    });
+                    window.errorListenerAdded = true;
+                }
+            </script>
+        </div>
+    </div>
+</div>

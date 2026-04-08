@@ -1,0 +1,71 @@
+<div id="turn-indicator" hx-swap-oob="true" style="width: 100%; text-align: center; margin-bottom: 15px;">
+    <span style="padding: 8px 20px; border-radius: 20px; font-size: 0.8rem; font-family: 'Press Start 2P', cursive; 
+          background: {% if is_my_turn %} #2E8B57 {% else %} #444 {% endif %}; 
+          color: {% if is_my_turn %} white {% else %} #888 {% endif %}; border: 2px solid rgba(255,255,255,0.1);">
+        {% if is_my_turn %} SUA VEZ {% else %} VEZ DE: {{ turn_name | upper }} {% endif %}
+    </span>
+</div>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; padding-top: 30px;" 
+     id="player-hand"
+     hx-get="/match/status/{{ match.id }}/{{ player.id }}" 
+     hx-trigger="{% if not is_my_turn %}every 2s{% else %}none{% endif %}"
+     hx-target="#player-hand" 
+     hx-swap="outerHTML">
+     
+    {% for tile in hand %}
+    <div class="domino-wrapper" style="position: relative; display: inline-block;">
+        
+        {% if is_my_turn %}
+        <div class="arrows-container">
+            <button class="arrow-btn" onclick="playPiece({{tile.id}}, 'left', event)">←</button>
+            <button class="arrow-btn" onclick="playPiece({{tile.id}}, 'right', event)">→</button>
+        </div>
+        {% endif %}
+
+        <div class="domino-tile" 
+             style="{% if not is_my_turn %} opacity: 0.6; cursor: not-allowed; {% endif %}"
+             {% if is_my_turn %} onclick="toggleArrows(this)" {% endif %}
+             id="tile-{{ tile.id }}">
+            <div class="domino-half">{{ tile.left_value }}</div>
+            <div class="domino-divider"></div>
+            <div class="domino-half">{{ tile.right_value }}</div>
+        </div>
+    </div>
+    {% endfor %}
+    
+    {% if not hand %}
+        <p style="color: #bbb; font-size: 0.8rem; text-transform: uppercase;">Você bateu!</p>
+    {% endif %}
+
+    <div style="width: 100%; display: flex; justify-content: center; margin-top: 15px; gap: 15px;">
+        <button class="btn" style="background: #2E8B57; padding: 10px; font-size: 0.7rem; {% if not is_my_turn %} opacity: 0.5; cursor: not-allowed; {% endif %}" 
+                {% if is_my_turn %} hx-post="/match/draw/{{ player.id }}" hx-target="#player-hand" hx-swap="outerHTML" {% endif %}>COMPRAR PEÇA</button>
+                
+        <button class="btn" style="background: #e6a817; padding: 10px; font-size: 0.7rem; {% if not is_my_turn %} opacity: 0.5; cursor: not-allowed; {% endif %}" 
+                {% if is_my_turn %} hx-post="/match/pass/{{ player.id }}" hx-target="#player-hand" hx-swap="outerHTML" {% endif %}>PULAR VEZ</button>
+    </div>
+</div>
+
+<div class="board" id="game-board" hx-swap-oob="true">
+    <div style="display: flex; gap: 2px; align-items: center; padding: 10px; min-width: min-content;">
+        
+        {% if not board_tiles %}
+            <p style="color: rgba(255, 255, 255, 0.4); font-size: 0.9rem; font-family: sans-serif; text-transform: uppercase; letter-spacing: 2px; width: 100%; text-align: center;">A mesa está limpa</p>
+        {% endif %}
+
+        {% for tile in board_tiles %}
+            {% if tile.left_value == tile.right_value %}
+                <div class="domino-tile" style="flex-shrink: 0; width: var(--t-min); height: var(--t-max); flex-direction: column; margin: 2px; cursor: default; border-color: #555; box-shadow: 2px 2px 5px rgba(0,0,0,0.5);">
+                    <div class="domino-half" style="border-bottom: 2px solid #222;">{{ tile.left_value }}</div>
+                    <div class="domino-half">{{ tile.right_value }}</div>
+                </div>
+            {% else %}
+                <div class="domino-tile" style="flex-shrink: 0; width: var(--t-max); height: var(--t-min); flex-direction: row; margin: 2px; cursor: default; border-color: #555; box-shadow: 2px 2px 5px rgba(0,0,0,0.5);">
+                    <div class="domino-half" style="border-right: 2px solid #222;">{{ tile.left_value }}</div>
+                    <div class="domino-half">{{ tile.right_value }}</div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>

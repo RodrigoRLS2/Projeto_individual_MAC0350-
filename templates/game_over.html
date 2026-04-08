@@ -1,0 +1,20 @@
+<div id="player-hand" style="display: none;"></div>
+
+<script>
+    Swal.fire({
+        title: '{% if winner.id == player.id %}🏆 VOCÊ VENCEU! 🏆{% else %}💀 FIM DE JOGO! 💀{% endif %}',
+        text: '{% if winner.id == player.id %}Parabéns, você bateu e venceu a partida!{% else %}O vencedor foi: {{ winner.name | upper }}{% endif %}',
+        icon: '{% if winner.id == player.id %}success{% else %}error{% endif %}',
+        confirmButtonText: 'Voltar ao Menu Principal',
+        background: '#222',
+        color: '#fff',
+        confirmButtonColor: '#e6a817',
+        allowOutsideClick: false, /* Obriga o jogador a clicar no botão */
+        allowEscapeKey: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Redireciona de volta para a tela inicial
+            window.location.href = "/";
+        }
+    });
+</script>
